@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Will You Be My Valentine? 💝</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  background: white;
+  width: 90%;
+  max-width: 420px;
+  padding: 25px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  z-index: 2;
+}
+
+h1 {
+  color: #ff4757;
+}
+
+button {
+  background: #ff6b6b;
+  border: none;
+  color: white;
+  padding: 12px 22px;
+  border-radius: 25px;
+  font-size: 16px;
+  margin: 10px;
+  cursor: pointer;
+}
+button:hover {
+  background: #ff8787;
+}
+
+.hidden {
+  display: none;
+}
+
+.floating {
+  position: absolute;
+  font-size: 28px;
+  animation: floatUp linear infinite;
+  opacity: 0.8;
+}
+
+@keyframes floatUp {
+  from { transform: translateY(110vh); }
+  to { transform: translateY(-120vh); }
+}
+
+canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div class="card">
+
+  <!-- ❤️ YOUR PHOTO -->
+  <img src="https://i.imgur.com/kZrrWX8.jpeg"
+       alt="Us ❤️"
+       style="
+         width:100%;
+         max-height:240px;
+         object-fit:cover;
+         border-radius:15px;
+         margin-bottom:15px;
+       ">
+
+  <h1 id="question">Do you like me?</h1>
+
+  <div id="buttons">
+    <button onclick="firstAnswer()">Yes</button>
+    <button id="noBtn">No</button>
+  </div>
+
+  <div id="meter" class="hidden">
+    <h1>This much!</h1>
+    <h1 id="percent">100%</h1>
+    <button onclick="nextStep()">Next ❤️</button>
+  </div>
+
+  <div id="final" class="hidden">
+    <h1>Will you be my Valentine…?</h1>
+    <button onclick="celebrate()">Yes!</button>
+    <button id="finalNoBtn">No</button>
+  </div>
+
+  <div id="celebration" class="hidden">
+    <h1>Yay! I'm the luckiest person 💖</h1>
+    <p>Now come get your gift… 🎁💝🤗💋❤️💕</p>
+  </div>
+
+</div>
+
+<script>
+// FLOATING HEARTS & BEARS
+const emojis = ['❤️','💖','💝','💗','💓','🧸','🐻'];
+for (let i = 0; i < 30; i++) {
+  const el = document.createElement("div");
+  el.className = "floating";
+  el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+  el.style.left = Math.random() * 100 + "vw";
+  el.style.animationDuration = (10 + Math.random() * 10) + "s";
+  document.body.appendChild(el);
+}
+
+// ELEMENTS
+const q = document.getElementById("question");
+const btns = document.getElementById("buttons");
+const meter = document.getElementById("meter");
+const percent = document.getElementById("percent");
+const final = document.getElementById("final");
+const celebration = document.getElementById("celebration");
+
+// ✅ FIRST ANSWER ("Yes")
+function firstAnswer() {
+  q.innerText = "I don't like you, I love you! ❤️";
+  btns.classList.add("hidden");
+  meter.classList.remove("hidden");
+
+  let p = 100;
+  const interval = setInterval(() => {
+    p += Math.floor(Math.random() * 200);
+    percent.innerText = p + "%";
+    if (p > 5000) clearInterval(interval);
+  }, 100);
+}
+
+// ✅ NEXT STEP
+function nextStep() {
+  meter.classList.add("hidden");
+  final.classList.remove("hidden");
+}
+
+// ✅ CELEBRATION
+function celebrate() {
+  final.classList.add("hidden");
+  celebration.classList.remove("hidden");
+  startConfetti();
+}
+
+// 🎉 CONFETTI EFFECT
+function startConfetti() {
+  const canvas = document.getElementById("confetti");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext("2d");
+
+  const pieces = Array.from({ length: 150 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 6 + 4,
+    c: `hsl(${Math.random() * 360},100%,50%)`,
+    s: Math.random() * 5 + 2
+  }));
+
+  setInterval(() => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.fillStyle = p.c;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+      p.y += p.s;
+      if (p.y > canvas.height) p.y = 0;
+    });
+  }, 20);
+}
+
+// 💌 FUN INTERACTIVE "NO" BUTTON (runs away!)
+const noBtn = document.getElementById("noBtn");
+noBtn.addEventListener("mouseenter", () => {
+  const x = Math.random() * 60; // horizontal %
+  const y = Math.random() * 60; // vertical %
+  noBtn.style.position = "relative";
+  noBtn.style.left = x + "%";
+  noBtn.style.top = y + "%";
+});
+noBtn.addEventListener("click", () => {
+  alert("Oops 😏 Wrong answer! Try clicking 'Yes' ❤️");
+});
+
+// Optional: final question "No" also runs away
+const finalNoBtn = document.getElementById("finalNoBtn");
+finalNoBtn.addEventListener("mouseenter", () => {
+  const x = Math.random() * 60;
+  const y = Math.random() * 60;
+  finalNoBtn.style.position = "relative";
+  finalNoBtn.style.left = x + "%";
+  finalNoBtn.style.top = y + "%";
+});
+finalNoBtn.addEventListener("click", () => {
+  alert("Haha 😏 You already know the answer, try 'Yes' ❤️");
+});
+</script>
+
+</body>
+</html>
